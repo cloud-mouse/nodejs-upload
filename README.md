@@ -3,6 +3,7 @@
 
 运行到服务器上，请修改服务器URL, 分别修改index.js 、getImages.js
 ## Quick Start
+1、在根目录新建 uplad文件夹 存放静态资源
 
 **Install**
 
@@ -11,7 +12,7 @@ $ npm install
 
 ```
 
-** Run **
+**Run**
 ```
 $ nodemon index   // or node index
 ```
