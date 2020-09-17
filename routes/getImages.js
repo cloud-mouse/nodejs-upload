@@ -3,7 +3,7 @@ var router = express.Router();
 var fs = require('fs');
 let path = require('path');
 const URL = "http://localhost:3000" // 全局url
-// const URL = "xx" // 线上服务器全局url
+// const URL = "xxx" // 线上服务器全局url
 
 var image = require("imageinfo"); 
 

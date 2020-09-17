@@ -23,11 +23,11 @@ var Storage = multer.diskStorage({
     callback(null, "./upload");
   },
   filename: function (req, file, callback) {
-    callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+    callback(null, file.fieldname + "_" + Date.now() );
   }
 });
 console.log(path.join(__dirname, 'upload'));
-var upload = multer({ storage: Storage }).array("imgUploader", 3); //Field name and max count
+var upload = multer({ storage: Storage }).array("files", 3); //Field name and max count
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/index.html");
 });
