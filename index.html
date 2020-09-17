@@ -80,7 +80,7 @@
           <li v-for="(item,index) in list" :key="index">
             <img v-if="is_img_url(item.url)" :src="item.url" width="50" height="50" :title="item.filename"
               :alt="item.filename">
-            <img v-else src="http://212.129.244.20:3000/files/files_1600333831556.png" width="50" height="50"
+            <img v-else src="https://s1.ax1x.com/2020/09/17/wWfrzF.png" width="50" height="50"
               :title="item.filename" :alt="item.filename">
             <span>{{item.url}}</span>
             <i class="el-icon-circle-close remove" @click="remove(item)"></i>
@@ -132,21 +132,34 @@
       },
       remove(item) {
         let that = this
-        fetch('api/deletefile', {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ file: item.filename })
-        }).then(function (response) {
-          return response.json()
-        }).then(function (res) {
-          console.log(res);
-          that.$message.success(res.msg)
-          that.getList()
-        }).catch(function (err) {
-          //中途的任何地方出错  都会在这里被捕获到
-        })
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          fetch('api/deletefile', {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ file: item.filename })
+          }).then(function (response) {
+            return response.json()
+          }).then(function (res) {
+            console.log(res);
+            that.$message.success(res.msg)
+            that.getList()
+          }).catch(function (err) {
+            //中途的任何地方出错  都会在这里被捕获到
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+
+        
       },
       //判断图片是否正确
       is_img_url(pathImg) {
