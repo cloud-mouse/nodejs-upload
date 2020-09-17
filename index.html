@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Upload images to server using Node JS</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery.form/3.09/jquery.form.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.9/vue.js"></script>
+
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <!-- 引入组件库 -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <style>
+    .content {
+      text-align: center;
+    }
+
+    .list ul {
+      padding: 0 20px;
+    }
+
+    .list ul li {
+      text-align: left;
+      list-style: none;
+      overflow: hidden;
+      margin-bottom: 10px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #dddddd;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .files {
+      position: absolute;
+      right: 50px;
+      top: 20px;
+    }
+
+    .remove {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="content">
+      <el-upload class="upload-demo" ref="upload" action="/api/upload" :on-preview="handlePreview"
+        :on-remove="handleRemove" name="imgUploader" :file-list="fileList" :auto-upload="false">
+        <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+        <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
+      <div class="list">
+        <h2>文件列表：</h2>
+        <div class="files">
+          <el-link href="/files" target="_blank">查看文件夹</el-link>
+        </div>
+        <ul>
+          <li v-for="(item,index) in list" :key="index">
+            <img :src="item.url" width="50" height="50" :title="item.filename" :alt="item.filename">
+            <span> {{index}}：{{item.url}} </span>
+            <i class="el-icon-circle-close remove" @click="remove(item)"></i>
+          </li>
+        </ul>
+        <p v-if="list.length==0">暂时没有文件</p>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      list: [],
+      fileList: []
+    },
+    created() {
+      // this.getList()
+    },
+    mounted() {
+      this.getList()
+    },
+    methods: {
+      getList() {
+        let that = this
+        fetch('api/fileList').then(function (response) {
+          return response.json()
+        }).then(function (returnedValue) {
+          that.list = returnedValue.data
+        }).catch(function (err) {
+          //中途的任何地方出错  都会在这里被捕获到
+          console.log(err);
+        })
+      },
+      async submitUpload() {
+        let that = this
+        await this.$refs.upload.submit();
+        setTimeout(() => {
+          that.$refs.upload.clearFiles();
+          that.getList()
+        }, 1000);
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      remove(item) {
+        let that = this
+        fetch('api/deletefile', {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ file: item.filename })
+        }).then(function (response) {
+          return response.json()
+        }).then(function (res) {
+          console.log(res);
+          that.$message.success(res.msg)
+          that.getList()
+        }).catch(function (err) {
+          //中途的任何地方出错  都会在这里被捕获到
+        })
+      }
+    },
+  })
+</script>
+
+</html>
